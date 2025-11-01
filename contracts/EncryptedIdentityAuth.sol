@@ -8,9 +8,13 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @notice Allows users to register and verify their identity using FHE encryption
 /// @dev Users can register an encrypted identity and later verify it without exposing plaintext
 contract EncryptedIdentityAuth is SepoliaConfig {
+    // Events
+    event IdentityRegistered(address indexed user, uint256 timestamp);
+    event IdentityVerified(address indexed user, uint256 timestamp);
+
     // Mapping from user address to their encrypted identity
     mapping(address => euint32) private _encryptedIdentities;
-    
+
     // Mapping to track if a user has registered
     mapping(address => bool) public isRegistered;
 
@@ -19,7 +23,7 @@ contract EncryptedIdentityAuth is SepoliaConfig {
     /// @param inputProof The input proof for the encrypted value
     function register(externalEuint32 encryptedIdentity, bytes calldata inputProof) external {
         require(!isRegistered[msg.sender], "User already registered");
-        
+
         euint32 encryptedEuint32 = FHE.fromExternal(encryptedIdentity, inputProof);
         _encryptedIdentities[msg.sender] = encryptedEuint32;
         isRegistered[msg.sender] = true;
@@ -27,6 +31,8 @@ contract EncryptedIdentityAuth is SepoliaConfig {
         // Allow contract and user to access the encrypted identity
         FHE.allowThis(_encryptedIdentities[msg.sender]);
         FHE.allow(_encryptedIdentities[msg.sender], msg.sender);
+
+        emit IdentityRegistered(msg.sender, block.timestamp);
     }
 
     /// @notice Verify if the provided encrypted identity matches the stored one
@@ -48,7 +54,9 @@ contract EncryptedIdentityAuth is SepoliaConfig {
         // Allow contract and user to access the encrypted result
         FHE.allowThis(result);
         FHE.allow(result, msg.sender);
-        
+
+        emit IdentityVerified(msg.sender, block.timestamp);
+
         return result;
     }
 
