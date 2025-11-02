@@ -27,6 +27,7 @@ export const IdentityAuth = () => {
   const [contractAddress, setContractAddress] = useState<string | undefined>(undefined);
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState<string | null>(null);
+  const [registrationCount, setRegistrationCount] = useState<number>(0);
   
   // Encryption/Decryption process visibility
   const [showProcessDetails, setShowProcessDetails] = useState<boolean>(false);
