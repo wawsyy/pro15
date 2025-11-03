@@ -22,10 +22,12 @@ describe("EncryptedIdentityAuth", function () {
   let signers: Signers;
   let contract: EncryptedIdentityAuth;
   let contractAddress: string;
+  let fhevm: FhevmType;
 
   before(async function () {
     const ethSigners: HardhatEthersSigner[] = await ethers.getSigners();
     signers = { deployer: ethSigners[0], alice: ethSigners[1], bob: ethSigners[2] };
+    fhevm = await ethers.getFhevm();
   });
 
   beforeEach(async function () {
