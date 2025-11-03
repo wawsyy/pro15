@@ -188,3 +188,7 @@ For issues and questions:
 - Check FHEVM documentation: https://docs.zama.ai/fhevm
 - Zama Discord: https://discord.gg/zama
 
+## Security
+
+This project uses Fully Homomorphic Encryption (FHE) to ensure that user identities remain private throughout the authentication process. The encryption is performed client-side before any data is sent to the blockchain.
+
