@@ -67,5 +67,12 @@ contract EncryptedIdentityAuth is SepoliaConfig {
         require(isRegistered[user], "User not registered");
         return _encryptedIdentities[user];
     }
+
+    /// @notice Check if an address is registered
+    /// @param user The address to check
+    /// @return True if the user is registered
+    function isUserRegistered(address user) external view returns (bool) {
+        return isRegistered[user];
+    }
 }
 
