@@ -5,6 +5,8 @@ import { ClientProviders } from "./client-providers";
 export const metadata: Metadata = {
   title: "Encrypted Identity Authentication",
   description: "Privacy-preserving identity authentication using FHE",
+  keywords: ["FHE", "blockchain", "privacy", "authentication", "encryption"],
+  authors: [{ name: "Encrypted Identity Auth Team" }],
   icons: {
     icon: "/logo.svg",
   },
