@@ -44,24 +44,60 @@ export function useZamaInstance() {
       })
       .catch((e) => {
         if (!abortController.signal.aborted) {
-          // Filter out expected network errors from the error message
+          // Log detailed error information for debugging
           const errorMessage = e instanceof Error ? e.message : String(e);
+          const errorStack = e instanceof Error ? e.stack : undefined;
+          
+          console.error("[useZamaInstance] Failed to create FHEVM instance:", {
+            error: errorMessage,
+            stack: errorStack,
+            chainId,
+            isConnected,
+            address,
+          });
+          
+          // Check error type
           const isNetworkError = 
             errorMessage.includes("relayer") ||
             errorMessage.includes("connection") ||
             errorMessage.includes("keyurl") ||
             errorMessage.includes("ERR_CONNECTION_CLOSED") ||
-            errorMessage.includes("network");
+            errorMessage.includes("network") ||
+            errorMessage.includes("fetch") ||
+            errorMessage.includes("timeout");
           
-          // Only set error for non-network issues
-          if (!isNetworkError) {
-            setError(e);
+          const isSDKError = 
+            errorMessage.includes("SDK") ||
+            errorMessage.includes("relayerSDK") ||
+            errorMessage.includes("window.relayerSDK") ||
+            errorMessage.includes("Failed to load");
+          
+          const isMockChainError = 
+            chainId === 31337 && (
+              errorMessage.includes("ECONNREFUSED") ||
+              errorMessage.includes("localhost") ||
+              errorMessage.includes("Hardhat") ||
+              errorMessage.includes("metadata")
+            );
+          
+          // Set error with more context
+          if (isMockChainError) {
+            const detailedError = new Error(
+              `Failed to connect to local Hardhat node. Please ensure the Hardhat node is running: npx hardhat node`
+            );
+            setError(detailedError);
+          } else if (isSDKError) {
+            setError(new Error(`Failed to load FHEVM SDK: ${errorMessage}`));
+          } else if (!isNetworkError) {
+            setError(e instanceof Error ? e : new Error(String(e)));
           } else {
-            // For network errors, we'll still try to use the instance if possible
-            // (it might work with cached data or mock mode)
-            console.warn("[useZamaInstance] Network error during initialization, but may still work with cached data:", errorMessage);
+            // For network errors, log but don't set as critical error
+            // The instance might still work with cached data
+            console.warn("[useZamaInstance] Network error during initialization (may be recoverable):", errorMessage);
           }
+          
           setIsLoading(false);
+          setInstance(undefined); // Ensure instance is cleared on error
         }
       });
 

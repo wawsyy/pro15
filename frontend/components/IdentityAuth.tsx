@@ -15,7 +15,7 @@ export const IdentityAuth = () => {
   const chainId = useChainId();
   const publicClient = usePublicClient();
   const ethersSignerPromise = useEthersSigner();
-  const { instance: zama, isLoading: zamaLoading } = useZamaInstance();
+  const { instance: zama, isLoading: zamaLoading, error: zamaError } = useZamaInstance();
   const { storage } = useInMemoryStorage();
 
   const [userIdentity, setUserIdentity] = useState<string>("");
@@ -117,7 +117,14 @@ export const IdentityAuth = () => {
     }
 
     if (!zama) {
-      setMessage("⚠️ Encryption system is not ready. Please wait a moment for the encryption system to initialize. Network errors during initialization are normal and can be ignored.");
+      if (zamaError) {
+        const errorMsg = zamaError instanceof Error ? zamaError.message : String(zamaError);
+        setMessage(`⚠️ Encryption system initialization failed: ${errorMsg}. Please check your network connection and try refreshing the page.`);
+      } else if (zamaLoading) {
+        setMessage("⏳ Encryption system is loading... Please wait.");
+      } else {
+        setMessage("⚠️ Encryption system is not ready. Please wait a moment for the encryption system to initialize. If this persists, try refreshing the page.");
+      }
       return;
     }
 
@@ -246,7 +253,14 @@ export const IdentityAuth = () => {
     }
 
     if (!zama) {
-      setMessage("⚠️ Encryption system is not ready. Please wait a moment for the encryption system to initialize. Network errors during initialization are normal and can be ignored.");
+      if (zamaError) {
+        const errorMsg = zamaError instanceof Error ? zamaError.message : String(zamaError);
+        setMessage(`⚠️ Encryption system initialization failed: ${errorMsg}. Please check your network connection and try refreshing the page.`);
+      } else if (zamaLoading) {
+        setMessage("⏳ Encryption system is loading... Please wait.");
+      } else {
+        setMessage("⚠️ Encryption system is not ready. Please wait a moment for the encryption system to initialize. If this persists, try refreshing the page.");
+      }
       return;
     }
 
@@ -499,6 +513,41 @@ export const IdentityAuth = () => {
                       <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {zamaError && (
+            <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-orange-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3 flex-1">
+                  <h3 className="text-sm font-medium text-orange-800">Encryption System Initialization Error</h3>
+                  <div className="mt-2 text-sm text-orange-700">
+                    <p>{zamaError instanceof Error ? zamaError.message : String(zamaError)}</p>
+                    {chainId === 31337 && (
+                      <div className="mt-3 p-3 bg-orange-100 rounded-md">
+                        <p className="font-semibold mb-1">For local Hardhat node:</p>
+                        <code className="text-xs block bg-white p-2 rounded border border-orange-200">
+                          cd pro15 && npx hardhat node
+                        </code>
+                      </div>
+                    )}
+                    <div className="mt-3 p-3 bg-orange-100 rounded-md">
+                      <p className="font-semibold mb-1">Troubleshooting:</p>
+                      <ul className="list-disc list-inside text-xs space-y-1">
+                        <li>Check your network connection</li>
+                        <li>Try refreshing the page</li>
+                        <li>Ensure your wallet is connected</li>
+                        <li>For local development, ensure Hardhat node is running with FHEVM support</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
