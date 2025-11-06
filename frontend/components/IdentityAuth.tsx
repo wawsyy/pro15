@@ -229,7 +229,7 @@ export const IdentityAuth = () => {
     } finally {
       setIsRegistering(false);
     }
-  }, [userIdentity, zama, zamaLoading, ethersSignerPromise, contractAddress, address, isConnected, chainId, checkRegistration]);
+  }, [userIdentity, zama, zamaLoading, zamaError, ethersSignerPromise, contractAddress, address, isConnected, chainId, checkRegistration]);
 
   const handleVerify = useCallback(async () => {
     if (!userIdentity) {
@@ -424,7 +424,7 @@ export const IdentityAuth = () => {
     } finally {
       setIsVerifying(false);
     }
-  }, [userIdentity, zama, zamaLoading, ethersSignerPromise, contractAddress, address, isConnected, chainId, storage]);
+  }, [userIdentity, zama, zamaLoading, zamaError, ethersSignerPromise, contractAddress, address, isConnected, chainId, storage]);
 
   // Prevent hydration mismatch - show loading state until mounted
   if (!isMounted) {
@@ -548,7 +548,7 @@ export const IdentityAuth = () => {
                         <li>For local development, ensure Hardhat node is running with FHEVM support</li>
                         {zamaError instanceof Error && zamaError.message.includes("Bad JSON") && (
                           <li className="font-semibold text-orange-800 mt-2">
-                            💡 Tip: "Bad JSON" errors are often temporary. Try refreshing after a few seconds.
+                            💡 Tip: &quot;Bad JSON&quot; errors are often temporary. Try refreshing after a few seconds.
                           </li>
                         )}
                       </ul>
