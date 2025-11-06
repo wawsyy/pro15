@@ -192,3 +192,11 @@ For issues and questions:
 
 This project uses Fully Homomorphic Encryption (FHE) to ensure that user identities remain private throughout the authentication process. The encryption is performed client-side before any data is sent to the blockchain.
 
+## Troubleshooting
+
+### Common Issues
+
+1. **FHEVM Node Connection**: Ensure your local Hardhat node is running with FHEVM support
+2. **Wallet Connection**: Make sure your wallet is connected to the correct network
+3. **Gas Estimation**: FHE operations may require higher gas limits than standard transactions
+
