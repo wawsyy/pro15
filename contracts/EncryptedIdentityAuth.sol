@@ -8,6 +8,9 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @notice Allows users to register and verify their identity using FHE encryption
 /// @dev Users can register an encrypted identity and later verify it without exposing plaintext
 contract EncryptedIdentityAuth is SepoliaConfig {
+    // Constants
+    uint256 public constant MAX_IDENTITY_VALUE = 999999;
+
     // Events
     event IdentityRegistered(address indexed user, uint256 timestamp);
     event IdentityVerified(address indexed user, uint256 timestamp);
