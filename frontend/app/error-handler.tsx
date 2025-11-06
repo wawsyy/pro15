@@ -1,30 +1,36 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 /**
  * Global error handler to suppress expected network errors that don't affect functionality
+ * Uses useLayoutEffect to register handlers synchronously before DOM paint
  */
 export function ErrorHandler() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Helper function to check if error should be suppressed
     const shouldSuppressError = (errorString: string): boolean => {
+      const normalizedError = errorString.toLowerCase();
       return (
-        errorString.includes("Failed to fetch") ||
-        errorString.includes("fetch failed") ||
-        errorString.includes("ECONNREFUSED") ||
-        errorString.includes("NetworkError") ||
-        errorString.includes("Network request failed") ||
-        errorString.includes("ERR_CONNECTION_CLOSED") ||
-        errorString.includes("relayer.testnet.zama.cloud") ||
-        errorString.includes("ERR_BLOCKED_BY_RESPONSE") ||
-        errorString.includes("coinbase.com") ||
-        errorString.includes("cca-lite.coinbase.com") ||
-        errorString.includes("NotSameOriginAfterDefaultedToSameOriginByCoep") ||
-        errorString.includes("Base Account SDK requires") ||
-        errorString.includes("Cross-Origin-Opener-Policy header to not be set to 'same-origin'") ||
-        errorString.includes("Lit is in dev mode") ||
-        errorString.includes("RelayerSDKLoader: window does not contain 'relayerSDK' property")
+        normalizedError.includes("failed to fetch") ||
+        normalizedError.includes("fetch failed") ||
+        normalizedError.includes("econnrefused") ||
+        normalizedError.includes("networkerror") ||
+        normalizedError.includes("network request failed") ||
+        normalizedError.includes("err_connection_closed") ||
+        normalizedError.includes("relayer.testnet.zama.cloud") ||
+        normalizedError.includes("err_blocked_by_response") ||
+        normalizedError.includes("coinbase.com") ||
+        normalizedError.includes("cca-lite.coinbase.com") ||
+        normalizedError.includes("notsameoriginafterdefaultedtosameoriginbycoep") ||
+        normalizedError.includes("base account sdk requires") ||
+        normalizedError.includes("cross-origin-opener-policy") ||
+        normalizedError.includes("lit is in dev mode") ||
+        normalizedError.includes("relayersdkloader") ||
+        normalizedError.includes("keyurl") ||
+        normalizedError.includes("/v1/keyurl") ||
+        normalizedError.includes("relayer-sdk") ||
+        normalizedError.includes("zama.cloud")
       );
     };
 
