@@ -14,6 +14,7 @@ describe("EncryptedIdentityAuthSepolia", function () {
   let contractAddress: string;
   let step: number;
   let steps: number;
+  let fhevm: FhevmType;
 
   function progress(message: string) {
     console.log(`${++step}/${steps} ${message}`);
