@@ -91,6 +91,26 @@ npx hardhat deploy --network localhost  # In another terminal
 npx hardhat deploy --network sepolia
 ```
 
+### Deploy Frontend to Vercel
+
+The frontend is configured for Vercel deployment with automatic builds.
+
+#### Prerequisites
+1. [Create a Vercel account](https://vercel.com/signup)
+2. [Get a WalletConnect Project ID](https://cloud.walletconnect.com/)
+
+#### Deployment Steps
+1. Connect your GitHub repository to Vercel
+2. Vercel will automatically detect the Next.js project
+3. Add environment variables in Vercel dashboard:
+   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`: Your WalletConnect Project ID
+
+#### Vercel Configuration
+The `frontend/vercel.json` file contains:
+- Custom build command that ensures ABI files are generated
+- Required CORS headers for FHEVM operations
+- Next.js framework configuration
+
 ### Network Switching
 
 The frontend supports both **Hardhat Local** (Chain ID: 31337) and **Sepolia Testnet** (Chain ID: 11155111).
