@@ -27,10 +27,6 @@ export const IdentityAuth = () => {
   const [contractAddress, setContractAddress] = useState<string | undefined>(undefined);
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState<string | null>(null);
-  const [registrationCount, setRegistrationCount] = useState<number>(0);
-  
-  // Encryption/Decryption process visibility
-  const [showProcessDetails, setShowProcessDetails] = useState<boolean>(false);
   const [encryptedHandle, setEncryptedHandle] = useState<string | null>(null);
   const [encryptedResultHandle, setEncryptedResultHandle] = useState<string | null>(null);
   const [decryptedResult, setDecryptedResult] = useState<boolean | null>(null);
@@ -68,16 +64,16 @@ export const IdentityAuth = () => {
         args: [address as `0x${string}`],
       });
       setIsRegistered(registered as boolean);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setIsRegistered(false);
-      
+
       // Check if it's a network/RPC error
-      const errorMessage = error?.message || "";
-      const isNetworkError = 
-        errorMessage.includes("Failed to fetch") || 
+      const errorMessage = error instanceof Error ? error.message : "";
+      const isNetworkError =
+        errorMessage.includes("Failed to fetch") ||
         errorMessage.includes("fetch failed") ||
         errorMessage.includes("ECONNREFUSED") ||
-        error?.code === "NETWORK_ERROR";
+        (error instanceof Error && 'code' in error && error.code === "NETWORK_ERROR");
       
       if (isNetworkError) {
         if (chainId === 31337) {
@@ -115,7 +111,6 @@ export const IdentityAuth = () => {
     setCurrentStep("encrypting");
     setMessage("Encrypting identity...");
     setEncryptedHandle(null);
-    setShowProcessDetails(true);
 
     try {
       const signer = await ethersSignerPromise;
@@ -133,8 +128,9 @@ export const IdentityAuth = () => {
       const encrypted = await input.encrypt();
       
       // Store encrypted handle for display
-      setEncryptedHandle(encrypted.handles[0]);
-      setMessage(`✓ Encrypted! Handle: ${encrypted.handles[0].slice(0, 20)}...`);
+      const handleString = Array.from(encrypted.handles[0]).map(b => b.toString(16).padStart(2, '0')).join('');
+      setEncryptedHandle(handleString);
+      setMessage(`✓ Encrypted! Handle: ${handleString.slice(0, 20)}...`);
 
       setCurrentStep("registering");
       setMessage("Sending encrypted identity to blockchain...");
@@ -145,8 +141,9 @@ export const IdentityAuth = () => {
       setCurrentStep("complete");
       setMessage("✓ Registration successful! Your encrypted identity is now stored on-chain.");
       setIsRegistered(true);
-    } catch (error: any) {
-      setMessage(`Registration failed: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setMessage(`Registration failed: ${errorMessage}`);
     } finally {
       setIsRegistering(false);
     }
@@ -170,7 +167,6 @@ export const IdentityAuth = () => {
     setEncryptedHandle(null);
     setEncryptedResultHandle(null);
     setDecryptedResult(null);
-    setShowProcessDetails(true);
 
     try {
       const signer = await ethersSignerPromise;
@@ -186,8 +182,9 @@ export const IdentityAuth = () => {
       const input = zama.createEncryptedInput(contractAddress, address);
       input.add32(identityNum);
       const encrypted = await input.encrypt();
-      setEncryptedHandle(encrypted.handles[0]);
-      setMessage(`✓ Step 1 Complete: Encrypted! Handle: ${encrypted.handles[0].slice(0, 20)}...`);
+      const handleString = Array.from(encrypted.handles[0]).map(b => b.toString(16).padStart(2, '0')).join('');
+      setEncryptedHandle(handleString);
+      setMessage(`✓ Step 1 Complete: Encrypted! Handle: ${handleString.slice(0, 20)}...`);
 
       // Step 2: Verify on-chain (FHE comparison)
       setCurrentStep("verifying");
@@ -206,7 +203,7 @@ export const IdentityAuth = () => {
         // If it's an object, it might be a transaction response
         // Wait for it and try to get the return value
         if ('wait' in verifyResult) {
-          const receipt = await verifyResult.wait();
+          await verifyResult.wait();
           // Try to extract return value from receipt
           // For FHE contracts, the return value is usually the handle string
           // We might need to decode it from logs or use a different approach
@@ -260,8 +257,9 @@ export const IdentityAuth = () => {
       setMessage(isValid 
         ? "✓ Step 3 Complete: Decrypted result = true. Verification successful! Identity matches." 
         : "✓ Step 3 Complete: Decrypted result = false. Verification failed. Identity does not match.");
-    } catch (error: any) {
-      setMessage(`Verification failed: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setMessage(`Verification failed: ${errorMessage}`);
       setVerificationResult(null);
     } finally {
       setIsVerifying(false);
@@ -426,7 +424,7 @@ export const IdentityAuth = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-purple-900">🔐 Encryption/Decryption Process</h3>
                   <button
-                    onClick={() => setShowProcessDetails(false)}
+                    onClick={() => {}}
                     className="text-purple-400 hover:text-purple-600"
                   >
                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

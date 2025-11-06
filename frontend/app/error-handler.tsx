@@ -30,9 +30,9 @@ export function ErrorHandler() {
 
     // Override console.error to filter out expected network errors
     const originalError = console.error;
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
       const errorString = args.join(" ");
-      
+
       // Only log unexpected errors
       if (!shouldSuppressError(errorString)) {
         originalError.apply(console, args);
@@ -41,9 +41,9 @@ export function ErrorHandler() {
 
     // Override console.warn to filter out expected warnings
     const originalWarn = console.warn;
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: unknown[]) => {
       const warnString = args.join(" ");
-      
+
       // Suppress expected warnings
       if (!shouldSuppressError(warnString)) {
         originalWarn.apply(console, args);

@@ -37,9 +37,9 @@ const hardhatLocal = defineChain({
 // Create memory storage to avoid indexedDB issues in SSR
 const memoryStorage = createStorage({
   storage: {
-    getItem: (_key: string) => null,
-    setItem: (_key: string, _value: string) => {},
-    removeItem: (_key: string) => {},
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
   },
 });
 
@@ -56,38 +56,9 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: false, // Disable retries to prevent repeated failed fetch attempts
-      onError: (error: any) => {
-        // Silently handle expected network errors that don't affect functionality
-        const errorMessage = error?.message || "";
-        const isNetworkError = 
-          errorMessage.includes("Failed to fetch") ||
-          errorMessage.includes("fetch failed") ||
-          errorMessage.includes("ECONNREFUSED") ||
-          errorMessage.includes("NetworkError") ||
-          error?.code === "NETWORK_ERROR";
-        
-        // Only log non-network errors or unexpected errors
-        if (!isNetworkError) {
-          console.error("Query error:", error);
-        }
-      },
     },
     mutations: {
-      onError: (error: any) => {
-        // Silently handle expected network errors that don't affect functionality
-        const errorMessage = error?.message || "";
-        const isNetworkError = 
-          errorMessage.includes("Failed to fetch") ||
-          errorMessage.includes("fetch failed") ||
-          errorMessage.includes("ECONNREFUSED") ||
-          errorMessage.includes("NetworkError") ||
-          error?.code === "NETWORK_ERROR";
-        
-        // Only log non-network errors or unexpected errors
-        if (!isNetworkError) {
-          console.error("Mutation error:", error);
-        }
-      },
+      retry: false,
     },
   },
 });
