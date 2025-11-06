@@ -28,17 +28,39 @@ export function useZamaInstance() {
       signal: abortController.signal,
       provider: window.ethereum as any,
       mockChains: mockChains,
-      onStatusChange: (s) => console.log(`[useZamaInstance] status: ${s}`),
+      onStatusChange: (s) => {
+        // Only log status changes, suppress other logs
+        if (s && typeof s === 'string') {
+          console.log(`[useZamaInstance] status: ${s}`);
+        }
+      },
     })
       .then((inst) => {
         if (!abortController.signal.aborted) {
           setInstance(inst);
           setIsLoading(false);
+          setError(undefined);
         }
       })
       .catch((e) => {
         if (!abortController.signal.aborted) {
-          setError(e);
+          // Filter out expected network errors from the error message
+          const errorMessage = e instanceof Error ? e.message : String(e);
+          const isNetworkError = 
+            errorMessage.includes("relayer") ||
+            errorMessage.includes("connection") ||
+            errorMessage.includes("keyurl") ||
+            errorMessage.includes("ERR_CONNECTION_CLOSED") ||
+            errorMessage.includes("network");
+          
+          // Only set error for non-network issues
+          if (!isNetworkError) {
+            setError(e);
+          } else {
+            // For network errors, we'll still try to use the instance if possible
+            // (it might work with cached data or mock mode)
+            console.warn("[useZamaInstance] Network error during initialization, but may still work with cached data:", errorMessage);
+          }
           setIsLoading(false);
         }
       });

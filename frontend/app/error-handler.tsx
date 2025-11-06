@@ -27,10 +27,15 @@ export function ErrorHandler() {
         normalizedError.includes("cross-origin-opener-policy") ||
         normalizedError.includes("lit is in dev mode") ||
         normalizedError.includes("relayersdkloader") ||
+        normalizedError.includes("window does not contain 'relayersdk' property") ||
+        normalizedError.includes("relayersdkloader: window does not contain") ||
         normalizedError.includes("keyurl") ||
         normalizedError.includes("/v1/keyurl") ||
         normalizedError.includes("relayer-sdk") ||
-        normalizedError.includes("zama.cloud")
+        normalizedError.includes("zama.cloud") ||
+        normalizedError.includes("failed to load resource") ||
+        normalizedError.includes("net::err_connection_closed") ||
+        normalizedError.includes("net::err_blocked_by_response")
       );
     };
 

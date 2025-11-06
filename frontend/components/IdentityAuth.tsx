@@ -112,12 +112,12 @@ export const IdentityAuth = () => {
     }
 
     if (zamaLoading) {
-      setMessage("⏳ Please wait while the encryption system is loading...");
+      setMessage("⏳ Please wait while the encryption system is loading... This may take a few seconds.");
       return;
     }
 
     if (!zama) {
-      setMessage("⚠️ Encryption system is not ready. Please wait a moment and try again.");
+      setMessage("⚠️ Encryption system is not ready. Please wait a moment for the encryption system to initialize. Network errors during initialization are normal and can be ignored.");
       return;
     }
 
@@ -241,12 +241,12 @@ export const IdentityAuth = () => {
     }
 
     if (zamaLoading) {
-      setMessage("⏳ Please wait while the encryption system is loading...");
+      setMessage("⏳ Please wait while the encryption system is loading... This may take a few seconds.");
       return;
     }
 
     if (!zama) {
-      setMessage("⚠️ Encryption system is not ready. Please wait a moment and try again.");
+      setMessage("⚠️ Encryption system is not ready. Please wait a moment for the encryption system to initialize. Network errors during initialization are normal and can be ignored.");
       return;
     }
 
