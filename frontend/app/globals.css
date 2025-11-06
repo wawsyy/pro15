@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom styles for Encrypted Identity Auth */
+.identity-card {
+  @apply bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg shadow-sm;
+}
+
+.encryption-indicator {
+  @apply inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
