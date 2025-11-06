@@ -96,14 +96,39 @@ export const IdentityAuth = () => {
   }, [isConnected, contractAddress, checkRegistration]);
 
   const handleRegister = useCallback(async () => {
-    if (!userIdentity || !zama || !ethersSignerPromise || !contractAddress || !address) {
-      setMessage("Please connect wallet and enter identity");
+    if (!userIdentity) {
+      setMessage("⚠️ Please enter your identity number");
+      return;
+    }
+
+    if (!isConnected || !address) {
+      setMessage("⚠️ Please connect your wallet first");
+      return;
+    }
+
+    if (!contractAddress) {
+      setMessage("⚠️ Contract not deployed on this network. Please switch to the correct network or deploy the contract.");
+      return;
+    }
+
+    if (zamaLoading) {
+      setMessage("⏳ Please wait while the encryption system is loading...");
+      return;
+    }
+
+    if (!zama) {
+      setMessage("⚠️ Encryption system is not ready. Please wait a moment and try again.");
+      return;
+    }
+
+    if (!ethersSignerPromise) {
+      setMessage("⚠️ Wallet signer is not available. Please reconnect your wallet.");
       return;
     }
 
     const identityNum = parseInt(userIdentity);
-    if (isNaN(identityNum)) {
-      setMessage("Identity must be a number");
+    if (isNaN(identityNum) || identityNum < 0) {
+      setMessage("⚠️ Identity must be a positive number");
       return;
     }
 
@@ -141,23 +166,98 @@ export const IdentityAuth = () => {
       setCurrentStep("complete");
       setMessage("✓ Registration successful! Your encrypted identity is now stored on-chain.");
       setIsRegistered(true);
+      // Refresh registration status
+      await checkRegistration();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setMessage(`Registration failed: ${errorMessage}`);
+      console.error("Registration error:", error);
+      
+      let errorMessage = "Registration failed";
+      let errorDetails = "";
+
+      if (error instanceof Error) {
+        const errorStr = error.message.toLowerCase();
+        
+        // Handle user rejection
+        if (errorStr.includes("user rejected") || errorStr.includes("user denied") || errorStr.includes("action rejected")) {
+          errorMessage = "❌ Transaction rejected";
+          errorDetails = "You cancelled the transaction. Please try again if you want to proceed.";
+        }
+        // Handle insufficient funds
+        else if (errorStr.includes("insufficient funds") || errorStr.includes("balance")) {
+          errorMessage = "❌ Insufficient funds";
+          errorDetails = "You don't have enough funds to pay for the transaction gas fees.";
+        }
+        // Handle network errors
+        else if (errorStr.includes("network") || errorStr.includes("rpc") || errorStr.includes("connection")) {
+          errorMessage = "❌ Network error";
+          if (chainId === 31337) {
+            errorDetails = "Cannot connect to Hardhat node. Please make sure it's running with: npx hardhat node";
+          } else {
+            errorDetails = "Failed to connect to the blockchain network. Please check your internet connection and try again.";
+          }
+        }
+        // Handle encryption errors
+        else if (errorStr.includes("encrypt") || errorStr.includes("fhevm") || errorStr.includes("relayer")) {
+          errorMessage = "❌ Encryption error";
+          errorDetails = "Failed to encrypt your identity. This might be due to network issues with the encryption service. Please try again.";
+        }
+        // Handle contract errors
+        else if (errorStr.includes("already registered") || errorStr.includes("duplicate")) {
+          errorMessage = "⚠️ Already registered";
+          errorDetails = "This identity is already registered. You can verify it using the verification section below.";
+          setIsRegistered(true);
+          await checkRegistration();
+        }
+        // Generic error
+        else {
+          errorMessage = "❌ Registration failed";
+          errorDetails = error.message;
+        }
+      } else {
+        errorDetails = String(error);
+      }
+
+      setMessage(`${errorMessage}${errorDetails ? `: ${errorDetails}` : ""}`);
+      setCurrentStep("");
     } finally {
       setIsRegistering(false);
     }
-  }, [userIdentity, zama, ethersSignerPromise, contractAddress, address]);
+  }, [userIdentity, zama, zamaLoading, ethersSignerPromise, contractAddress, address, isConnected, chainId, checkRegistration]);
 
   const handleVerify = useCallback(async () => {
-    if (!userIdentity || !zama || !ethersSignerPromise || !contractAddress || !address) {
-      setMessage("Please connect wallet and enter identity");
+    if (!userIdentity) {
+      setMessage("⚠️ Please enter your identity number");
+      return;
+    }
+
+    if (!isConnected || !address) {
+      setMessage("⚠️ Please connect your wallet first");
+      return;
+    }
+
+    if (!contractAddress) {
+      setMessage("⚠️ Contract not deployed on this network. Please switch to the correct network or deploy the contract.");
+      return;
+    }
+
+    if (zamaLoading) {
+      setMessage("⏳ Please wait while the encryption system is loading...");
+      return;
+    }
+
+    if (!zama) {
+      setMessage("⚠️ Encryption system is not ready. Please wait a moment and try again.");
+      return;
+    }
+
+    if (!ethersSignerPromise) {
+      setMessage("⚠️ Wallet signer is not available. Please reconnect your wallet.");
       return;
     }
 
     const identityNum = parseInt(userIdentity);
-    if (isNaN(identityNum)) {
-      setMessage("Identity must be a number");
+    if (isNaN(identityNum) || identityNum < 0) {
+      setMessage("⚠️ Identity must be a positive number");
       return;
     }
 
@@ -258,13 +358,59 @@ export const IdentityAuth = () => {
         ? "✓ Step 3 Complete: Decrypted result = true. Verification successful! Identity matches." 
         : "✓ Step 3 Complete: Decrypted result = false. Verification failed. Identity does not match.");
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setMessage(`Verification failed: ${errorMessage}`);
+      console.error("Verification error:", error);
+      
+      let errorMessage = "Verification failed";
+      let errorDetails = "";
+
+      if (error instanceof Error) {
+        const errorStr = error.message.toLowerCase();
+        
+        // Handle user rejection
+        if (errorStr.includes("user rejected") || errorStr.includes("user denied") || errorStr.includes("action rejected")) {
+          errorMessage = "❌ Transaction rejected";
+          errorDetails = "You cancelled the transaction. Please try again if you want to proceed.";
+        }
+        // Handle insufficient funds
+        else if (errorStr.includes("insufficient funds") || errorStr.includes("balance")) {
+          errorMessage = "❌ Insufficient funds";
+          errorDetails = "You don't have enough funds to pay for the transaction gas fees.";
+        }
+        // Handle network errors
+        else if (errorStr.includes("network") || errorStr.includes("rpc") || errorStr.includes("connection")) {
+          errorMessage = "❌ Network error";
+          if (chainId === 31337) {
+            errorDetails = "Cannot connect to Hardhat node. Please make sure it's running with: npx hardhat node";
+          } else {
+            errorDetails = "Failed to connect to the blockchain network. Please check your internet connection and try again.";
+          }
+        }
+        // Handle encryption errors
+        else if (errorStr.includes("encrypt") || errorStr.includes("decrypt") || errorStr.includes("fhevm") || errorStr.includes("relayer")) {
+          errorMessage = "❌ Encryption/Decryption error";
+          errorDetails = "Failed to encrypt or decrypt your identity. This might be due to network issues with the encryption service. Please try again.";
+        }
+        // Handle contract errors
+        else if (errorStr.includes("not registered")) {
+          errorMessage = "⚠️ Identity not registered";
+          errorDetails = "This identity has not been registered yet. Please register it first using the registration section above.";
+        }
+        // Generic error
+        else {
+          errorMessage = "❌ Verification failed";
+          errorDetails = error.message;
+        }
+      } else {
+        errorDetails = String(error);
+      }
+
+      setMessage(`${errorMessage}${errorDetails ? `: ${errorDetails}` : ""}`);
       setVerificationResult(null);
+      setCurrentStep("");
     } finally {
       setIsVerifying(false);
     }
-  }, [userIdentity, zama, ethersSignerPromise, contractAddress, address, storage]);
+  }, [userIdentity, zama, zamaLoading, ethersSignerPromise, contractAddress, address, isConnected, chainId, storage]);
 
   // Prevent hydration mismatch - show loading state until mounted
   if (!isMounted) {
@@ -533,8 +679,26 @@ export const IdentityAuth = () => {
             )}
 
             {message && (
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <p className="text-sm text-gray-700">{message}</p>
+              <div className={`rounded-lg p-4 border ${
+                message.startsWith("✓") || message.startsWith("✅")
+                  ? "bg-green-50 border-green-200"
+                  : message.startsWith("❌") || message.startsWith("⚠️")
+                  ? "bg-red-50 border-red-200"
+                  : message.startsWith("⏳")
+                  ? "bg-blue-50 border-blue-200"
+                  : "bg-gray-50 border-gray-200"
+              }`}>
+                <p className={`text-sm ${
+                  message.startsWith("✓") || message.startsWith("✅")
+                    ? "text-green-800 font-medium"
+                    : message.startsWith("❌")
+                    ? "text-red-800 font-medium"
+                    : message.startsWith("⚠️")
+                    ? "text-orange-800 font-medium"
+                    : message.startsWith("⏳")
+                    ? "text-blue-800 font-medium"
+                    : "text-gray-700"
+                }`}>{message}</p>
               </div>
             )}
 
