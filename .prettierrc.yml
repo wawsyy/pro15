@@ -3,6 +3,8 @@ plugins:
 printWidth: 120
 trailingComma: "all"
 endOfLine: "lf"
+semi: true
+singleQuote: false
 
 overrides:
   - files: "*.md"
