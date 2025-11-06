@@ -18,6 +18,7 @@ import type { TaskArguments } from "hardhat/types";
  *
  *   npx hardhat --network localhost task:register --identity 12345
  *   npx hardhat --network localhost task:verify --identity 12345
+ *   npx hardhat --network localhost task:check-registration --address 0x...
  *
  *
  * Tutorial: Deploy and Interact on Sepolia (--network sepolia)
