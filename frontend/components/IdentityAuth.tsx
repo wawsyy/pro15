@@ -542,9 +542,15 @@ export const IdentityAuth = () => {
                       <p className="font-semibold mb-1">Troubleshooting:</p>
                       <ul className="list-disc list-inside text-xs space-y-1">
                         <li>Check your network connection</li>
-                        <li>Try refreshing the page</li>
+                        <li>Try refreshing the page (Ctrl+R or Cmd+R)</li>
+                        <li>Wait a moment and try again (relayer server may be temporarily busy)</li>
                         <li>Ensure your wallet is connected</li>
                         <li>For local development, ensure Hardhat node is running with FHEVM support</li>
+                        {zamaError instanceof Error && zamaError.message.includes("Bad JSON") && (
+                          <li className="font-semibold text-orange-800 mt-2">
+                            💡 Tip: "Bad JSON" errors are often temporary. Try refreshing after a few seconds.
+                          </li>
+                        )}
                       </ul>
                     </div>
                   </div>

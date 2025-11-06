@@ -80,10 +80,21 @@ export function useZamaInstance() {
               errorMessage.includes("metadata")
             );
           
+          const isRelayerBadJsonError = 
+            errorMessage.includes("Bad JSON") ||
+            errorMessage.includes("didn't response correctly") ||
+            errorMessage.includes("Relayer didn't response");
+          
           // Set error with more context
           if (isMockChainError) {
             const detailedError = new Error(
               `Failed to connect to local Hardhat node. Please ensure the Hardhat node is running: npx hardhat node`
+            );
+            setError(detailedError);
+          } else if (isRelayerBadJsonError) {
+            // This is a common issue with relayer server responses
+            const detailedError = new Error(
+              `Relayer didn't response correctly. Bad JSON. This may be due to network issues or relayer server problems. Try refreshing the page or wait a moment and try again.`
             );
             setError(detailedError);
           } else if (isSDKError) {
